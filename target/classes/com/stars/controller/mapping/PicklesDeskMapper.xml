@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.stars.controller.dao.PicklesDeskMapper" >
+  <resultMap id="BaseResultMap" type="com.stars.controller.entity.PicklesDesk">
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="room_id" property="roomId" jdbcType="INTEGER" />
+    <result column="name" property="name" jdbcType="VARCHAR" />
+    <result column="player_count" property="playerCount" jdbcType="INTEGER" />
+    <result column="base_coin" property="baseCoin" jdbcType="INTEGER" />
+    <result column="limit_coin" property="limitCoin" jdbcType="INTEGER" />
+    <result column="auto_start" property="autoStart" jdbcType="INTEGER" />
+    <result column="total_game" property="totalGame" jdbcType="INTEGER" />
+    <result column="is_cut" property="isCut" jdbcType="TINYINT" />
+    <result column="is_start" property="isCut" jdbcType="TINYINT" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="is_deleted" property="isDeleted" jdbcType="TINYINT" />
+    <result column="exchange" property="exchange" jdbcType="INTEGER" />
+  </resultMap>
+  <select id="selectByRoomId" resultMap="BaseResultMap" parameterType="java.lang.Integer"  >
+    select * from pickles_desk where room_id=#{roomId} and is_deleted=false
+  </select>
+
+  <select id="selectById" resultMap="BaseResultMap" parameterType="java.lang.Integer"  >
+    select * from pickles_desk where id=#{id} and is_deleted=false
+  </select>
+
+</mapper>

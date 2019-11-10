@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.stars.controller.dao.SystemConfigMapper" >
+  <resultMap id="BaseResultMap" type="com.stars.controller.entity.SystemConfig">
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="user_check" property="userCheck" jdbcType="INTEGER" />
+    <result column="pay_check_money" property="payCheckMoney" jdbcType="INTEGER" />
+    <result column="expiry_check_money" property="expiryCheckMoney" jdbcType="INTEGER" />
+    <result column="lease_check" property="leaseCheck" jdbcType="INTEGER" />
+    <result column="authorize" property="authorize" jdbcType="INTEGER" />
+    <result column="sum_pay_money" property="sumPayMoney" jdbcType="INTEGER" />
+    <result column="temp_sum_pay_money" property="tempSumPayMoney" jdbcType="INTEGER" />
+    <result column="sum_expiry_money" property="sumExpiryMoney" jdbcType="INTEGER" />
+    <result column="temp_sum_expiry_money" property="tempSumExpiryMoney" jdbcType="INTEGER" />
+    <result column="user_sum_money" property="userSumMoney" jdbcType="INTEGER" />
+    <result column="temp_user_sum_money" property="tempUserSumMoney" jdbcType="INTEGER" />
+    <result column="promoter_sum_money" property="promoterSumMoney" jdbcType="INTEGER" />
+    <result column="temp_promoter_sum_money" property="tempPromoterSumMoney" jdbcType="INTEGER" />
+    <result column="money_overrun" property="moneyOverrun" jdbcType="INTEGER" />
+    <result column="not_active" property="notActive" jdbcType="INTEGER" />
+    <result column="chat" property="chat" jdbcType="INTEGER" />
+    <result column="pay_scale" property="payScale" jdbcType="INTEGER" />
+    <result column="promoter_pay_scale" property="promoterPayScale" jdbcType="INTEGER" />
+    <result column="game_status" property="gameStatus" jdbcType="INTEGER" />
+    <result column="weihu_time" property="weihuTime" jdbcType="INTEGER" />
+    <result column="content" property="content" jdbcType="VARCHAR" />
+    <result column="switch_type" property="switchType" jdbcType="INTEGER" />
+    <result column="interact_password" property="interactPassword" jdbcType="INTEGER" />
+    <result column="open_luck_game" property="openLuckGame" jdbcType="INTEGER" />
+    <result column="open_fish_game" property="openFishGame" jdbcType="INTEGER" />
+    <result column="open_card_game" property="openCardGame" jdbcType="INTEGER" />
+    <result column="operation_status" property="operationStatus" jdbcType="INTEGER" />
+    <result column="operation_date" property="operationDate" jdbcType="VARCHAR" />
+    <result column="operation_stop_date" property="operationStopDate" jdbcType="BIGINT" />
+    <result column="baodan_status" property="baodanStatus" jdbcType="INTEGER" />
+    <result column="lack_baodan_status" property="lackBaodanStatus" jdbcType="INTEGER" />
+    <result column="expiry" property="expiry" jdbcType="INTEGER" />
+    <result column="baodan_pwd" property="baodanPwd" jdbcType="VARCHAR" />
+  </resultMap>
+  <select id="selectSystemConfigByOne" resultMap="BaseResultMap"  >
+    select * from system_config where id=1;
+  </select>
+
+
+
+</mapper>

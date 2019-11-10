@@ -10,6 +10,13 @@ public class RoleService {
     @Autowired
     private RoleMapper mapper;
     public User selectByUserName(String username) {
-        return selectByUserName(username);
+        return mapper.selectByUserName(username);
+    }
+
+    public void updateUserLastGame(int userId, int gameType) {
+        User user=new User();
+        user.setId(userId);
+        user.setLastGame(gameType);
+        mapper.updateUserLastGame(user);
     }
 }

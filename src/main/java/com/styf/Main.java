@@ -12,7 +12,7 @@ public class Main {
     public static void main(String[] args) throws Exception {
         ApplicationContext ctx = new ClassPathXmlApplicationContext("applicationContext.xml");
         MyServer server = ctx.getBean(MyServer.class);
-        server.bind(10031);
+        server.bind(10030);
     }
 
 }

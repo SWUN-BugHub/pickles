@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 
+import com.stars.controller.entity.User;
 import io.netty.channel.ChannelHandlerContext;
 import org.apache.log4j.Logger;
 
@@ -19,6 +20,7 @@ public class LocalMem
   public static String version = "1.2.14";
   public static boolean special = false;
   public static int num = -1;
+  public static Map<Integer, User> userMap=new HashMap<Integer, User>();
   public static Map<Integer, Long> userIdList = new ConcurrentHashMap();
   public static Map<ChannelHandlerContext, String> keySession = new ConcurrentHashMap();
   public static Map<Integer, ChannelHandlerContext> userSessionList = new ConcurrentHashMap();

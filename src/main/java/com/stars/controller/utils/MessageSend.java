@@ -69,7 +69,7 @@ public class MessageSend
         byte[] content = msgJson.getBytes("utf-8");
         
         String sendContent = new String(content);
-        MessageSend.logger.info(" send json  " + sendContent);
+       // MessageSend.logger.info(" send json  " + sendContent);
         if (!this.an.method.equals("publicKey")) {
           content = MyUtil.AESencryption_1_UTF8(content, this.an.ctx);
         }

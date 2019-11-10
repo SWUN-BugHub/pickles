@@ -5,28 +5,17 @@ import com.stars.controller.util.LocalMem;
 import com.stars.controller.util.MyApplicationContextUtil;
 import com.stars.controller.utils.ManageBufferSession;
 import com.stars.controller.utils.MessageSend;
-import com.styf.pojo.AppVersion;
-import com.styf.service.AppVersionService;
+import com.styf.netty.net.CommonWSMessageHandler;
+import com.styf.netty.net.IClientConnection;
 import io.netty.buffer.ByteBuf;
-import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerAdapter;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelPromise;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.OutputStream;
 import java.lang.reflect.Method;
-import java.net.SocketAddress;
-import java.nio.ByteBuffer;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -34,22 +23,56 @@ import java.util.Map;
  */
 @Component
 @ChannelHandler.Sharable
-public class HelloServerHandler extends ChannelHandlerAdapter{
+public class HelloServerHandler extends ChannelHandlerAdapter {
 
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) {
         System.out.println("收到消息");
         try {
-            ByteBuf buf = (ByteBuf)msg;
-            //创建目标大小的数组
-            byte[] barray = new byte[buf.readableBytes()];
-            //把数据从bytebuf转移到byte[]
-            buf.getBytes(0,barray);
-            String jsonStr = new String(barray, "UTF-8");
-            jsonStr=jsonStr.substring(jsonStr.indexOf("{"),jsonStr.length());
+            ByteBuf buffer = (ByteBuf)msg;
+            int beginIndex;
+            int lenth;
+            while (true) {
+                //包头开始游标点
+                beginIndex = buffer.readerIndex();
+                //标记初始读游标位置
+                buffer.markReaderIndex();
+                lenth=buffer.readInt();
+                if (lenth >0&&lenth< 20480) {
+                    break;
+                }
+                //未读到包头标识略过一个字节
+                buffer.resetReaderIndex();
+                buffer.readByte();
+
+                //不满足
+                if (buffer.readableBytes() < 8) {
+                    return ;
+                }
+            }
+            //读取数据长度
+
+            //数据包还没到齐
+            if(buffer.readableBytes() < lenth){
+                buffer.readerIndex(beginIndex);
+                return ;
+            }
+            //读数据部分
+            byte[] data = new byte[lenth];
+            buffer.readBytes(data);
+            String jsonStr = new String(data, "UTF-8");
             System.out.println(jsonStr);
-            buf.release();
+
+//            ByteBuf buf = (ByteBuf)msg;
+//            //创建目标大小的数组
+//            byte[] barray = new byte[buf.readableBytes()];
+//            //把数据从bytebuf转移到byte[]
+//            buf.getBytes(0,barray);
+//            String jsonStr = new String(barray, "UTF-8");
+//            jsonStr=jsonStr.substring(jsonStr.indexOf("{"),jsonStr.length());
+//            System.out.println(jsonStr);
+//            buf.release();
 
 
             JSONObject json = null;
@@ -87,9 +110,9 @@ public class HelloServerHandler extends ChannelHandlerAdapter{
                 long time = json.getLong("time");
                 if (System.currentTimeMillis() - time > 50000L)
                 {
-                    System.out.println("非秘钥交换和心跳包文  请求时间超过5秒,服务器将session主动断开  " + method + (System.currentTimeMillis() - time));
-                    ctx.close();
-                    return;
+                  //  System.out.println("非秘钥交换和心跳包文  请求时间超过5秒,服务器将session主动断开  " + method + (System.currentTimeMillis() - time));
+//                    ctx.close();
+//                    return;
                 }
             }
             Object[] args_login = new Object[args.length + 1];
@@ -173,13 +196,18 @@ public class HelloServerHandler extends ChannelHandlerAdapter{
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
-        System.out.println("连接成功"+ctx.name());
-        super.channelActive(ctx);
+        super.channelActive(ctx);//连接上了
+        IClientConnection conn = new NettyClientConnection(new CommonWSMessageHandler(), ctx.channel(), 40960);
+        ctx.channel().attr(CommonConst.CLIENT_CON).set(conn);
+
     }
 
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
         System.out.println("连接关闭"+ctx.name());
+        IClientConnection conn = (IClientConnection)ctx.channel().attr(CommonConst.CLIENT_CON).get();
+        if (!conn.isServerClosed())
+            conn.onDisconnect();
         super.channelInactive(ctx);
     }
 

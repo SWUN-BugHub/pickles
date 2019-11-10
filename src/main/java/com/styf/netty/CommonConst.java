@@ -1,5 +1,6 @@
 package com.styf.netty;
 
+import com.styf.netty.net.IClientConnection;
 import io.netty.util.AttributeKey;
 
 public final class CommonConst {

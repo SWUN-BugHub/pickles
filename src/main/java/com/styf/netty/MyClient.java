@@ -28,8 +28,8 @@ public class MyClient {
 
                         @Override
                         protected void initChannel(SocketChannel socketChannel) throws Exception {
-                            socketChannel.pipeline().addLast(new LineBasedFrameDecoder(1024));
-                            socketChannel.pipeline().addLast(new StringDecoder());
+                         //   socketChannel.pipeline().addLast(new LineBasedFrameDecoder(1024));
+                          //  socketChannel.pipeline().addLast(new StringDecoder());
                             socketChannel.pipeline().addLast(new HelloClientHandler());
                         }
                     });
@@ -43,6 +43,6 @@ public class MyClient {
 
 
     public static void main(String[] args) throws Exception {
-        new MyClient().connect(10031,"127.0.0.1");
+        new MyClient().connect(10030,"127.0.0.1");
     }
 }

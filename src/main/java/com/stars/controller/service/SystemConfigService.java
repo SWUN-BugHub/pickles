@@ -11,9 +11,15 @@ public class SystemConfigService
 {
   @Autowired
   private SystemConfigMapper systemConfigDao;
-  
+
+  private SystemConfig systemConfig=new SystemConfig();
   public SystemConfig getSystemConfig()
   {
-    return this.systemConfigDao.getSystemConfig();
+    systemConfig=this.systemConfigDao.selectSystemConfigByOne();
+    return systemConfig;
   }
+
+    public SystemConfig getSystemConfig2() {
+      return systemConfig;
+    }
 }

@@ -1,5 +1,7 @@
 package com.stars.controller.entity;
 
+import io.netty.channel.ChannelHandlerContext;
+
 public class User
 {
   public Integer getId() {
@@ -14,7 +16,7 @@ public class User
   private String username;
   private String nickname;
   private String name;
-  private char sex;
+  private Character sex;
   private String password;
   private String phone;
   private String card;
@@ -22,27 +24,38 @@ public class User
   private String answer;
   private String registDate;
   private String loginDate;
-  private int status = 0;
-  private int overflow = 0;
-  private int gameGold = 0;
-  private int expeGold = 0;
-  private double levelScore = 0.0D;
-  private int gameScore = 0;
-  private int expeScore = 0;
-  private int level = 1;
-  private int photoId = 1;
-  private int lastDeskId;
-  private int shutupStatus = 0;
-  private int lastGame;
-  private int type;
-  private int expiryNum = 0;
-  private int payMoney;
-  private int promoterId;
+  private Integer status = 0;
+  private Integer overflow = 0;
+  private Integer gameGold = 0;
+  private Integer expeGold = 0;
+  private Double levelScore = 0.0D;
+  private Integer gameScore = 0;
+  private Integer expeScore = 0;
+  private Integer level = 1;
+  private Integer photoId = 1;
+  private Integer lastDeskId;
+  private Integer shutupStatus = 0;
+  private Integer lastGame;
+  private Integer type;
+  private Integer expiryNum = 0;
+  private Integer payMoney;
+  private Integer promoterId;
   private String promoterName;
-  private int borrow;
-  private int displayStatus;
-  private int currentGameScore;
-  
+  private Integer borrow;
+  private Integer displayStatus;
+  private Integer currentGameScore;
+
+  public ChannelHandlerContext getCtx() {
+    return ctx;
+  }
+
+  public void setCtx(ChannelHandlerContext ctx) {
+    this.ctx = ctx;
+  }
+
+  private ChannelHandlerContext ctx;
+
+
   public String getUsername()
   {
     return this.username;
