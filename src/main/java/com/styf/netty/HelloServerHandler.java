@@ -1,6 +1,7 @@
 package com.styf.netty;
 
 
+import com.stars.controller.entity.User;
 import com.stars.controller.util.LocalMem;
 import com.stars.controller.util.MyApplicationContextUtil;
 import com.stars.controller.utils.ManageBufferSession;
@@ -17,6 +18,7 @@ import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Method;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Created by ywy on 16/9/13.
@@ -204,10 +206,26 @@ public class HelloServerHandler extends ChannelHandlerAdapter {
 
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
-        System.out.println("连接关闭"+ctx.name());
+
         IClientConnection conn = (IClientConnection)ctx.channel().attr(CommonConst.CLIENT_CON).get();
         if (!conn.isServerClosed())
+        {
             conn.onDisconnect();
+        }
+        Integer userId=(Integer)conn.getAttribute("id");
+        if(userId!=null&&!LocalMem.deskUserList.containsKey(userId)&&LocalMem.temporaryList.containsKey(userId))
+        {
+            LocalMem.temporaryList.remove(userId);
+        }
+        else if(userId!=null&&LocalMem.deskUserList.containsKey(userId)&&LocalMem.roomMap.get(LocalMem.deskUserList.get(userId)).getTakesUser().containsKey(userId))
+        {
+            LocalMem.roomMap.get(LocalMem.deskUserList.get(userId)).getTakesUser().remove(userId);
+        }
+        else if(userId!=null&&LocalMem.deskUserList.containsKey(userId)&&LocalMem.roomMap.get(LocalMem.deskUserList.get(userId)).getWatchersById(userId)!=null
+                &&LocalMem.roomMap.get(LocalMem.deskUserList.get(userId)).getRoomInfo().isStart()==false)
+        {
+            LocalMem.roomMap.get(LocalMem.deskUserList.get(userId)).getWatchers().remove(LocalMem.roomMap.get(LocalMem.deskUserList.get(userId)).getWatchersById(userId));
+        }
         super.channelInactive(ctx);
     }
 

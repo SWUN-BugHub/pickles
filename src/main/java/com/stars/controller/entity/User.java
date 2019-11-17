@@ -1,6 +1,12 @@
 package com.stars.controller.entity;
 
+import com.google.gson.ExclusionStrategy;
+import com.google.gson.FieldAttributes;
 import io.netty.channel.ChannelHandlerContext;
+import jdk.nashorn.internal.ir.annotations.Ignore;
+
+import java.lang.annotation.Annotation;
+import java.util.Collection;
 
 public class User
 {
@@ -17,33 +23,67 @@ public class User
   private String nickname;
   private String name;
   private Character sex;
+  @Ignore
   private String password;
+  @Ignore
   private String phone;
+  @Ignore
   private String card;
   private String question;
   private String answer;
+  @Ignore
   private String registDate;
+  @Ignore
   private String loginDate;
+  @Ignore
   private Integer status = 0;
+  @Ignore
   private Integer overflow = 0;
+
   private Integer gameGold = 0;
   private Integer expeGold = 0;
+  @Ignore
   private Double levelScore = 0.0D;
+
   private Integer gameScore = 0;
   private Integer expeScore = 0;
+  @Ignore
   private Integer level = 1;
+  @Ignore
   private Integer photoId = 1;
+  @Ignore
   private Integer lastDeskId;
+  @Ignore
   private Integer shutupStatus = 0;
+  @Ignore
   private Integer lastGame;
+  @Ignore
   private Integer type;
+  @Ignore
   private Integer expiryNum = 0;
+  @Ignore
   private Integer payMoney;
+  @Ignore
   private Integer promoterId;
+  @Ignore
   private String promoterName;
+  @Ignore
   private Integer borrow;
+  @Ignore
   private Integer displayStatus;
+  @Ignore
   private Integer currentGameScore;
+
+
+  public Integer getRoomId() {
+    return roomId;
+  }
+
+  public void setRoomId(Integer roomId) {
+    this.roomId = roomId;
+  }
+
+  private Integer roomId;
 
   public ChannelHandlerContext getCtx() {
     return ctx;
@@ -53,6 +93,7 @@ public class User
     this.ctx = ctx;
   }
 
+  @Ignore
   private ChannelHandlerContext ctx;
 
 
@@ -246,7 +287,7 @@ public class User
     this.photoId = photoId;
   }
   
-  public int getBorrow()
+  public Integer getBorrow()
   {
     return this.borrow;
   }
@@ -286,7 +327,7 @@ public class User
     this.shutupStatus = shutupStatus;
   }
   
-  public int getDisplayStatus()
+  public Integer getDisplayStatus()
   {
     return this.displayStatus;
   }
@@ -306,7 +347,7 @@ public class User
     this.lastGame = lastGame;
   }
   
-  public int getCurrentGameScore()
+  public Integer getCurrentGameScore()
   {
     return this.currentGameScore;
   }
@@ -365,4 +406,5 @@ public class User
   {
     this.promoterName = promoterName;
   }
+
 }

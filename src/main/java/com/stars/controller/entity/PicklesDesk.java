@@ -1,6 +1,7 @@
 package com.stars.controller.entity;
 
 import java.util.Date;
+import java.util.List;
 
 public class PicklesDesk
 {
@@ -12,11 +13,49 @@ public class PicklesDesk
   private Integer limitCoin;
   private Integer autoStart;
   private Integer totalGame;
+  private Integer xiaZhuTime;
+
+    public Integer getXiaZhuTime() {
+        return xiaZhuTime;
+    }
+
+    public void setXiaZhuTime(Integer xiaZhuTime) {
+        this.xiaZhuTime = xiaZhuTime;
+    }
+
+    public Integer getQiangZhuangTime() {
+        return qiangZhuangTime;
+    }
+
+    public void setQiangZhuangTime(Integer qiangZhuangTime) {
+        this.qiangZhuangTime = qiangZhuangTime;
+    }
+
+    public Integer getBaseType() {
+        return baseType;
+    }
+
+    public void setBaseType(Integer baseType) {
+        this.baseType = baseType;
+    }
+
+    private Integer qiangZhuangTime;
+  private Integer baseType;
   private Boolean isCut;
-  private Boolean isStart;
+  private Boolean isStart=false;
   private Date createTime;
   private Boolean isDeleted;
   private Integer exchange;
+
+    public List<User> getUserList() {
+        return userList;
+    }
+
+    public void setUserList(List<User> userList) {
+        this.userList = userList;
+    }
+
+    private List<User> userList;
   public int getId() {
 	return id;
 }

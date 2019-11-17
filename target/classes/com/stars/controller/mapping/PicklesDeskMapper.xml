@@ -14,6 +14,9 @@
     <result column="is_start" property="isCut" jdbcType="TINYINT" />
     <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
     <result column="is_deleted" property="isDeleted" jdbcType="TINYINT" />
+    <result column="xia_zhu_time" property="xiaZhuTime" jdbcType="INTEGER" />
+    <result column="qiang_zhuang_time" property="qiangZhuangTime" jdbcType="INTEGER" />
+    <result column="base_type" property="baseType" jdbcType="INTEGER" />
     <result column="exchange" property="exchange" jdbcType="INTEGER" />
   </resultMap>
   <select id="selectByRoomId" resultMap="BaseResultMap" parameterType="java.lang.Integer"  >

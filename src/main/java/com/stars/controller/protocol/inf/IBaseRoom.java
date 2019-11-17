@@ -11,7 +11,7 @@ public abstract interface IBaseRoom
 {
   public abstract PicklesDesk getRoomInfo();
 
-  public abstract Set<User> getWatchers();
+  public abstract Set<GameUser> getWatchers();
 
   public abstract void updatePlaceState(GameUser paramIGamePlayer);
 
@@ -21,4 +21,7 @@ public abstract interface IBaseRoom
 
   public abstract float getPlayerCoin(User paramIGamePlayer);
 
+  public abstract  BaseGame getGame();
+
+  public abstract void setGame(BaseGame game);
 }

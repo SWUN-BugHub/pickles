@@ -1,47 +1,385 @@
-/*
 package com.stars.controller.protocol;
-import java.text.DecimalFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 import com.stars.controller.entity.GameUser;
-import com.stars.controller.protocol.inf.IBaseRoom;
+import com.stars.controller.entity.PicklesDesk;
+import com.stars.controller.protocol.inf.*;
+import com.stars.controller.util.TimeUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.text.DecimalFormat;
+import java.util.*;
+
 public abstract class BaseRoom
-  implements IBaseRoom
+		implements IBaseRoom
 {
-  protected static final Logger LOGGER = LoggerFactory.getLogger(BaseRoom.class);
-  protected static final DecimalFormat decimalFormat = new DecimalFormat("0.00");
-  protected static ThreadSafeRandom random = new ThreadSafeRandom();
-  protected int MAX_PLAYER_COUNT;
-  protected int roomID;
-  protected boolean isUsing;
-  protected BaseGame game;
-  protected PlaceInfo[] places;
-  protected RoomInfo roomInfo;
-  protected Set<IGamePlayer> watchers;
-  protected int dealerID;
-  protected static IRedisComponent redis;
-  protected static ITimerComponent timer;
-  protected static IRoomComponent roomc;
-  protected long countDownTime = 0L;
-  public IEventListener listener;
-  public IEventListener exitListener;
-  private RoomMsgProto.RoomInfoPB.Builder roomInfoPB;
-  protected boolean startCountDown;
-  protected Map<Integer, IGamePlayer> mapPlayers;
-  protected DissolutionInfo dislutInfo;
-  protected ClubInfo clubInfo;
-  protected boolean isGameOver;
-  private String[] processTime;
-  */
+	protected static final Logger LOGGER = LoggerFactory.getLogger(BaseRoom.class);
+	protected static final DecimalFormat decimalFormat = new DecimalFormat("0.00");
+	//protected static ThreadSafeRandom random = new ThreadSafeRandom();
+	protected int MAX_PLAYER_COUNT;
+	protected int roomID;
+	protected boolean isUsing;
+	protected BaseGame game;
+	protected PlaceInfo[] places;
+	protected PicklesDesk roomInfo;
+	protected Set<GameUser> watchers;
+	protected Map<Integer,GameUser> takesUser;
+	protected int dealerID;
+	protected long countDownTime = 0L;
+	public IEventListener listener;
+	public IEventListener exitListener;
+	protected boolean startCountDown;
+	protected Map<Integer, GameUser> mapPlayers;
+//	protected DissolutionInfo dislutInfo;
+	protected boolean isGameOver;
+	private String[] processTime;
+
+	public BaseRoom()
+	{
+		watchers=new HashSet<GameUser>();
+		takesUser=new HashMap<Integer,GameUser>();
+        this.isUsing = false;
+        this.isGameOver = false;
+        this.exitListener = new ExitListener();
+        this.listener = new GameStopListener();
+	}
+	/**
+	 * 获得观战玩家
+	 */
+	@Override
+	public Set<GameUser> getWatchers() {
+		return this.watchers;
+	}
+	public Map<Integer,GameUser> getTakesUser() {
+		return this.takesUser;
+	}
+	public void addWatchers(GameUser gameUser) {
+	   this.watchers.add(gameUser);
+	}
+	public void addTakesUser(GameUser gameUser) {
+		this.takesUser.put(gameUser.getId(),gameUser);
+	}
+
+	public  GameUser getWatchersById(int userId)
+	{
+		Iterator<GameUser> iterator=watchers.iterator();
+		while(iterator.hasNext())
+		{
+			GameUser user=iterator.next();
+			if(user.getId()==userId)
+			{
+				return user;
+			}
+		}
+		return null;
+	}
+
+	public void sendToAll(String method,Object[] message)
+	{
+		Iterator<GameUser> iterator=watchers.iterator();
+		while(iterator.hasNext())
+		{
+			GameUser user=iterator.next();
+			user.sendPacket( method,message);
+		}
+		Set<Integer> keySet=takesUser.keySet();
+		for(Integer set:keySet)
+		{
+			takesUser.get(set).sendPacket(method,message);
+		}
+
+	}
+	/**
+	 * 获得game对象
+	 * @return
+	 */
+	public BaseGame getGame()
+	{
+		return this.game;
+	}
+
+	/**
+	 * 获得房间信息对象
+	 * @return
+	 */
+	public PicklesDesk getRoomInfo()
+	{
+		return this.roomInfo;
+	}
+
+	public  void startGame()
+	{
+		if (this.roomInfo==null)//判断房间是否存在
+		{
+			return ;
+		}
+		if(canStartGame(takesUser.size()))
+		{
+			this.roomInfo.setStart(true);
+			if (this.game == null)	//如果game等于空
+			{
+				game=new PicklesGame(this,takesUser,watchers);
+                if (this.game != null)
+                {
+                    this.game.init();			//初始化游戏
+                    this.game.initStopListener(this.listener, this.exitListener);//初始化停止监听器
+                }
+			}
+			else
+            {
+                this.game.reset(takesUser, this.watchers);//游戏不等于null时，直接调用原本的游戏
+            }
+		}
+
+	}
+    /**
+     * 获得地方
+     * @param player
+     * @return
+     */
+    public PlaceInfo getPlace(GameUser player)
+    {
+        if (player == null)
+            return null;
+        for (int i = 0; i < this.MAX_PLAYER_COUNT; i++)
+        {
+            if (this.places[i].getPlayer() == player)
+                return this.places[i];
+        }
+        return null;
+    }
+    /**
+     * 发送改变状态
+     * @param placeInfo
+     */
+    private void sendChangeState(PlaceInfo placeInfo)
+    {
+
+
+    }
+    /**
+     * 获取准备玩家计数
+     * @return
+     */
+    public int getPreparePlayerCount()
+    {
+        int count = 0;
+        for (int i = 0; i < this.MAX_PLAYER_COUNT; i++)
+        {
+            GameUser player = this.places[i].getPlayer();
+            if (player != null)
+            {
+                if (this.places[i].getState() == PlaceType.PREPARE)
+                {
+                    count++;
+                }
+            }
+        }
+        return count;
+    }
+    /**
+     * 都准备好了吗
+     * @return
+     */
+    private boolean iskAllPrepare()
+    {
+        int count = 0;
+        for (int i = 0; i < this.MAX_PLAYER_COUNT; i++)
+        {
+            GameUser player = this.places[i].getPlayer();
+            if (player != null)
+            {
+                if (this.places[i].getState() == PlaceType.UNPREPARE)
+                {
+                    return false;
+                }
+                count++;
+            }
+        }
+        return count >= getAutoStartPlayerCount();
+    }
+    /**
+     * 获得最低游戏玩家人数
+     * @return
+     */
+    private int getAutoStartPlayerCount() {
+        return 2;
+    }
+        /**
+         * 获得游戏状态
+         * @return
+         */
+    public boolean getGameState()
+    {
+        if (this.game == null)
+            return false;
+        if (!this.game.isStoped())
+            return true;
+        return false;
+    }
+    /**
+     * 改变位置状态
+     * @param value
+     * @param placeInfo
+     * @param check
+     */
+    public void changePlaceState(PlaceType value, PlaceInfo placeInfo, boolean check)
+    {
+
+        placeInfo.setState(value);
+        sendChangeState(placeInfo);
+        if (((value == PlaceType.PREPARE) && (check)) || (this.roomInfo.getAutoStart() == GameStartType.PREPARE.getValue()))
+        {
+            countDown(false);
+        }
+    }
+    /**
+     * 发送倒计时
+     * @param time
+     */
+    private void sendCountDown(int time)
+    {
+
+    }
+    /**
+     * 准备倒计时
+     */
+    public int getPrepareCountDownTime()
+    {
+        return 10;
+    }
+    /**
+     * 开始倒计时
+     * @return
+     */
+    public boolean startGameCountDown()
+    {
+        if (this.startCountDown)
+        {
+            return true;
+        }
+        if (!iskAllPrepare())
+        {
+            return false;
+        }
+        long now = TimeUtil.getCurrentDate().getTime();
+        this.startCountDown = true;
+
+
+        this.countDownTime = (this.countDownTime == 0L ? (this.countDownTime = now) : this.countDownTime);
+        sendCountDown(0);
+        return true;
+    }
+    /**
+     * 倒计时
+     */
+    public void countDown(boolean start)
+    {
+
+        if ((this.roomInfo.getAutoStart() == GameStartType.HAND_START.getValue()) ||
+                (this.roomInfo.getAutoStart() == GameStartType.OWNER.getValue())) {
+            return;
+        }
+        if ((!this.isUsing) || (getGameState()))
+        {
+            LOGGER.error("count_down: 1");
+            return;
+        }
+
+        int prepareCount = getPreparePlayerCount();
+        if ((!start) &&
+                (this.roomInfo.getAutoStart() == 0 ? prepareCount < getAutoStartPlayerCount() : prepareCount < this.roomInfo.getAutoStart()))
+        {
+            LOGGER.error("count_down: 2");
+            return;
+        }
+
+        if (iskAllPrepare())
+        {
+            this.countDownTime = 0L;
+        }
+        else if (!start)
+        {
+            LOGGER.error("place player not prepare");
+            return;
+        }
+
+        if ((this.countDownTime != 0L) || (!start))
+        {
+            LOGGER.error("count_down: 3");
+        }
+        else if (!iskAllPrepare())
+        {
+            this.countDownTime = (TimeUtil.getCurrentDate().getTime() + getPrepareCountDownTime() * 1000);
+        }
+
+        if ((!startGameCountDown()) && (start))
+        {
+            sendCountDown(getPrepareCountDownTime());
+        }
+    }
+    /**
+     * 构造函数
+     * @param
+     */
+
+	protected  boolean canStartGame(int size)
+	{
+		return size>=2;
+	}
+
+
+    /**
+     * 退出侦听器
+     * @author Administrator
+     *
+     */
+    private class ExitListener
+            implements IEventListener
+    {
+        /**
+         * 构造函数
+         */
+        private ExitListener()
+        {
+        }
+        /**
+         * 事件
+         */
+        public void onEvent(EventArg arg)
+        {
+            PlaceInfo place = BaseRoom.this.getPlace((GameUser)arg.getSource());
+            if (place != null)
+            {
+                BaseRoom.this.changePlaceState(PlaceType.UNPREPARE, place, false);
+            }
+        }
+    }
+    /**
+     * 游戏停止侦听器
+     * @author Administrator
+     *
+     */
+    private class GameStopListener
+            implements IEventListener
+    {
+        /**
+         * 构造函数
+         */
+        private GameStopListener()
+        {
+        }
+        /**
+         * 事件
+         */
+        public void onEvent(EventArg arg)
+        {
+
+        }
+    }
+
+}
+
 /**
    * 获取房间信息
    *//*
@@ -64,20 +402,7 @@ public abstract class BaseRoom
     this.roomInfoPB = getRoomInfoPB(this.roomInfo);
   }
   */
-/**
-   * 获得redis
-   * @return
-   *//*
 
-  protected IRedisComponent getRedis()
-  {
-    if (redis == null)
-    {
-      redis = (IRedisComponent)ComponentManager.getInstance().getComponent("RedisComponent");
-    }
-    return redis;
-  }
-  */
 /**
    * 定时器组件
    * @return
@@ -106,15 +431,7 @@ public abstract class BaseRoom
     return roomc;
   }
   */
-/**
-   * 获得观战玩家
-   *//*
 
-  public Set<IGamePlayer> getWatchers()
-  {
-    return this.watchers;
-  }
-  */
 /**
    * 地方玩家
    * @return
@@ -154,29 +471,11 @@ public abstract class BaseRoom
     this.dealerID = dealerID;
   }
   */
-/**
-   * 获得game对象
-   * @return
-   *//*
 
-  public BaseGame getGame()
-  {
-    return this.game;
-  }
-  */
-/**
-   * 获得房间信息对象
-   *//*
 
-  public RoomInfo getRoomInfo()
-  {
-    return this.roomInfo;
-  }
-  */
 /**
    * 设置房间信息对象
    *//*
-
   public void setRoomInfo(RoomInfo roomInfo)
   {
     this.roomInfo = roomInfo;
@@ -227,22 +526,8 @@ public abstract class BaseRoom
 
   public abstract void removeRobot();
   */
-/**
-   * 构造函数
-   * @param id
-   *//*
 
-  public BaseRoom(int id)
-  {
-    this.roomID = id;
-    this.isUsing = false;
-    this.isGameOver = false;
-    this.watchers = new HashSet<IGamePlayer>();
-    this.exitListener = new ExitListener();
-    this.listener = new GameStopListener();
-    this.mapPlayers = new HashMap<Integer, IGamePlayer>();
-  }
-  */
+
 /**
    * 初始化地方位置
    *//*

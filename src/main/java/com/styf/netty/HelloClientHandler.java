@@ -28,13 +28,13 @@ public class HelloClientHandler extends ChannelHandlerAdapter{
         msg.writeInt(body.getBytes().length);
         msg.writeBytes(body.getBytes());
         ctx.writeAndFlush(msg);
-        Thread.sleep(3000);
+        //Thread.sleep(3000);
         body = "{\"method\":\"userService/publicKey\",\"args\":[\"9GsPEp2kSUzvJajn1mUCUoyCQ4IcNR/FuvN9LpiUvIQxQZMpleofI3P2kv2DpH1+UOMMfkzolvG+A0I45byU4vJsWE76RmNB1k5sejIXc8V6eRKzKSc08iAKtvrmvVOBNDiStgfPfQGIup0ZHrASKjkTTzJvtT2LQ1SbCakwLBu=\",\"AQAB\"],\"version\":\"1.2.15\"}";
         msg = Unpooled.buffer(body.getBytes().length);
         msg.writeInt(body.getBytes().length);
         msg.writeBytes(body.getBytes());
         ctx.writeAndFlush(msg);
-        Thread.sleep(3000);
+        //Thread.sleep(3000);
         body = "{\"method\":\"userService/userLogin\",\"time\":1573204136429,\"args\":[\"aaaaaa\",\"a11111\"],\"version\":\"1.2.15\"}";
         msg = Unpooled.buffer(body.getBytes().length);
         msg.writeInt(body.getBytes().length);
@@ -83,6 +83,7 @@ public class HelloClientHandler extends ChannelHandlerAdapter{
     }
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
+        System.out.println(1);
         ByteBuf buf = (ByteBuf)msg;
         //创建目标大小的数组
         byte[] barray = new byte[buf.readableBytes()];

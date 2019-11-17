@@ -4502,3 +4502,6 @@ java.io.IOException: 远程主机强迫关闭了一个现有的连接。
 [INFO] [2019-11-10 19:08:33][com.stars.controller.utils.MessageSend]send messgae success
 [INFO] [2019-11-10 19:08:36][com.stars.controller.utils.MessageSend]send messgae success
 [INFO] [2019-11-10 19:08:39][com.stars.controller.utils.MessageSend]send messgae success
+[INFO] [2019-11-17 15:20:00][org.springframework.context.support.ClassPathXmlApplicationContext]Refreshing org.springframework.context.support.ClassPathXmlApplicationContext@1f7030a6: startup date [Sun Nov 17 15:20:00 CST 2019]; root of context hierarchy
+[INFO] [2019-11-17 15:20:00][org.springframework.beans.factory.xml.XmlBeanDefinitionReader]Loading XML bean definitions from class path resource [applicationContext.xml]
+[INFO] [2019-11-17 15:20:03][org.springframework.beans.factory.config.PropertyPlaceholderConfigurer]Loading properties file from class path resource [jdbc.properties]

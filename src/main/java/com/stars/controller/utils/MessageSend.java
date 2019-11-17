@@ -11,8 +11,12 @@ import java.util.concurrent.ThreadPoolExecutor.CallerRunsPolicy;
 import java.util.concurrent.TimeUnit;
 import javax.annotation.PostConstruct;
 
+import com.google.gson.GsonBuilder;
+import com.stars.controller.entity.IgnoreStrategy;
 import com.stars.controller.util.MyUtil;
 
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
 import org.apache.log4j.Logger;
 
 import org.springframework.stereotype.Service;
@@ -61,25 +65,31 @@ public class MessageSend
         Map<String, Object> msgContext = new HashMap();
         msgContext.put("method", this.an.method);
         msgContext.put("args", this.an.result);
-        
 
-        Gson gson = new Gson();
-        String msgJson = gson.toJson(msgContext);
+
+        GsonBuilder gson = new GsonBuilder ();
+        gson.addSerializationExclusionStrategy(new IgnoreStrategy());
+        String msgJson = gson.create().toJson(msgContext);
         System.out.println("返回:"+msgJson);
         byte[] content = msgJson.getBytes("utf-8");
         
         String sendContent = new String(content);
        // MessageSend.logger.info(" send json  " + sendContent);
-        if (!this.an.method.equals("publicKey")) {
-          content = MyUtil.AESencryption_1_UTF8(content, this.an.ctx);
-        }
-        ByteBuffer bb = ByteBuffer.allocate(content.length + 4);
-        bb.putInt(content.length);
-        bb.put(content);
-        bb.flip();
+//        if (!this.an.method.equals("publicKey")) {
+//          content = MyUtil.AESencryption_1_UTF8(content, this.an.ctx);
+//        }
+//        ByteBuffer bb = ByteBuffer.allocate(content.length + 4);
+//        bb.putInt(content.length);
+//        bb.put(content);
+//        bb.flip();
+//        msg = Unpooled.buffer(body.getBytes().length);
+        ByteBuf msg = Unpooled.buffer(sendContent.getBytes().length);
+        msg.writeInt(sendContent.getBytes().length);
+        msg.writeBytes(sendContent.getBytes());
         if (this.an.ctx != null)
         {
-          this.an.ctx.write(bb);
+          this.an.ctx.channel().writeAndFlush(msg);
+         // this.an.ctx.write(bb);
           MessageSend.logger.info("send messgae success");
         }
       }
